@@ -14,13 +14,29 @@ set -e
 echo "Fixing binary incompatibilities (numpy, pandas, pyarrow, datasets)..."
 
 # Use --only-binary to avoid compiling from source (which fails on old GCC).
-# Install all four together so pip resolves compatible versions in one pass.
 pip install --force-reinstall --only-binary :all: \
   numpy==1.26.4 \
   pandas==2.2.1 \
   pyarrow==15.0.2
 
-pip install --force-reinstall datasets==2.18.0
+# Install datasets with --no-deps first, then install its missing deps
+# separately. This prevents datasets from pulling in a newer pandas that
+# requires source compilation.
+pip install --no-deps --force-reinstall datasets==2.18.0
+
+# Install any missing pure-python deps of datasets that --no-deps skipped.
+# These are all pure-python or have binary wheels available.
+pip install --only-binary :all: \
+  fsspec[http] \
+  huggingface-hub \
+  packaging \
+  pyyaml \
+  dill \
+  multiprocess \
+  xxhash \
+  aiohttp \
+  requests \
+  tqdm
 
 echo "Verifying fix..."
 python -c "
