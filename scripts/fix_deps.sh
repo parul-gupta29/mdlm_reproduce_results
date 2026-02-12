@@ -6,15 +6,20 @@
 #   ValueError: pyarrow._fs.LocalFileSystem size changed, may indicate binary incompatibility.
 #
 # These are caused by mismatched C extensions between packages installed
-# via conda and pip. Fix: force-reinstall compatible versions via pip.
+# via conda and pip. Fix: force-reinstall compatible versions via pip
+# using only prebuilt binary wheels (--only-binary :all:).
 
 set -e
 
 echo "Fixing binary incompatibilities (numpy, pandas, pyarrow, datasets)..."
 
-pip install --force-reinstall numpy==1.26.4
-pip install --force-reinstall pandas==2.2.1
-pip install --force-reinstall pyarrow==15.0.2
+# Use --only-binary to avoid compiling from source (which fails on old GCC).
+# Install all four together so pip resolves compatible versions in one pass.
+pip install --force-reinstall --only-binary :all: \
+  numpy==1.26.4 \
+  pandas==2.2.1 \
+  pyarrow==15.0.2
+
 pip install --force-reinstall datasets==2.18.0
 
 echo "Verifying fix..."
