@@ -430,7 +430,10 @@ def get_dataset(
       text = example['article']
     else:
       text = example['text']
-    
+
+    # Filter out None/empty entries
+    text = [t if t is not None else '' for t in text]
+
     if detokenizer is not None:
       text = _apply_detokenizer(detokenizer)(text)
 
