@@ -374,12 +374,18 @@ def get_dataset(
     _parquet_base = ('https://huggingface.co/api/datasets/'
                      'gursi26/wikihow-cleaned/parquet/'
                      'default/train/')
-    dataset = datasets.load_dataset(
+    full_dataset = datasets.load_dataset(
       'parquet',
       data_files=[_parquet_base + '0.parquet',
                   _parquet_base + '1.parquet'],
       cache_dir=cache_dir,
       streaming=streaming)
+    # Split last 5% as test set
+    split = full_dataset['train'].train_test_split(
+      test_size=0.05, shuffle=False)
+    dataset = datasets.DatasetDict({
+      'train': split['train'],
+      'test': split['test']})
   else:
     dataset = datasets.load_dataset(
       dataset_name,
@@ -390,8 +396,7 @@ def get_dataset(
                       'openwebtext-valid']:
     data = dataset
   elif dataset_name == 'wikihow':
-    # Only has a 'train' split; use it for all modes
-    data = dataset['train']
+    data = dataset['test'] if mode != 'train' else dataset['train']
   else:
     data = dataset[mode]
 
@@ -567,10 +572,9 @@ def get_dataloaders(config, tokenizer, skip_train=False,
       cache_dir=config.data.cache_dir,
       block_size=config.model.length)
   
-  if config.data.valid in ['text8', 'lm1b', 'ag_news']:
+  if config.data.valid in ['text8', 'lm1b', 'ag_news',
+                           'wikihow']:
     validation_split = 'test'
-  elif config.data.valid == 'wikihow':
-    validation_split = 'train'
   else:
     validation_split = 'validation'
   if skip_valid:
