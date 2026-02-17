@@ -370,6 +370,11 @@ def get_dataset(
       'ag_news',
       cache_dir=cache_dir,
       streaming=streaming)
+  elif dataset_name == 'wikihow':
+    dataset = datasets.load_dataset(
+      'gursi26/wikihow-cleaned',
+      cache_dir=cache_dir,
+      streaming=streaming)
   else:
     dataset = datasets.load_dataset(
       dataset_name,
@@ -379,6 +384,9 @@ def get_dataset(
   if dataset_name in ['lambada', 'openwebtext-train',
                       'openwebtext-valid']:
     data = dataset
+  elif dataset_name == 'wikihow':
+    # Only has a 'train' split; use it for all modes
+    data = dataset['train']
   else:
     data = dataset[mode]
 
@@ -458,6 +466,9 @@ def get_dataset(
   elif dataset_name == 'ag_news':
     tokenized_dataset = tokenized_dataset.remove_columns(
       ['text', 'label'])
+  elif dataset_name == 'wikihow':
+    tokenized_dataset = tokenized_dataset.remove_columns(
+      ['text', 'title', 'summary'])
   else:
     tokenized_dataset = tokenized_dataset.remove_columns(
       'text')
@@ -553,6 +564,8 @@ def get_dataloaders(config, tokenizer, skip_train=False,
   
   if config.data.valid in ['text8', 'lm1b', 'ag_news']:
     validation_split = 'test'
+  elif config.data.valid == 'wikihow':
+    validation_split = 'train'
   else:
     validation_split = 'validation'
   if skip_valid:

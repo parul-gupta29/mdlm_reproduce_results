@@ -32,6 +32,7 @@ ALL_DATASETS=(
   ag_news
   scientific_papers_pubmed
   scientific_papers_arxiv
+  wikihow
 )
 
 # If a dataset argument is given, only evaluate that one
