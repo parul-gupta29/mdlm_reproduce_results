@@ -371,8 +371,13 @@ def get_dataset(
       cache_dir=cache_dir,
       streaming=streaming)
   elif dataset_name == 'wikihow':
+    _parquet_base = ('https://huggingface.co/api/datasets/'
+                     'gursi26/wikihow-cleaned/parquet/'
+                     'default/train/')
     dataset = datasets.load_dataset(
-      'gursi26/wikihow-cleaned',
+      'parquet',
+      data_files=[_parquet_base + '0.parquet',
+                  _parquet_base + '1.parquet'],
       cache_dir=cache_dir,
       streaming=streaming)
   else:
