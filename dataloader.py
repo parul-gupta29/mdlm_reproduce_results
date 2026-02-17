@@ -371,13 +371,13 @@ def get_dataset(
       cache_dir=cache_dir,
       streaming=streaming)
   elif dataset_name == 'wikihow':
-    _parquet_base = ('https://huggingface.co/api/datasets/'
-                     'gursi26/wikihow-cleaned/parquet/'
-                     'default/train/')
+    _parquet_base = ('https://huggingface.co/datasets/'
+                     'gursi26/wikihow-cleaned/resolve/'
+                     'refs%2Fconvert%2Fparquet/default/train/')
     full_dataset = datasets.load_dataset(
       'parquet',
-      data_files=[_parquet_base + '0.parquet',
-                  _parquet_base + '1.parquet'],
+      data_files=[_parquet_base + '0000.parquet',
+                  _parquet_base + '0001.parquet'],
       cache_dir=cache_dir,
       streaming=streaming)
     # Split last 5% as test set
